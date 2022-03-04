@@ -185,19 +185,19 @@ uint8_t JustWifi::_populate(uint8_t networkCount) {
 
         }
 
-		{
-		    char buffer[128];
-		    sprintf_P(buffer,
-		        PSTR("%s BSSID: %02X:%02X:%02X:%02X:%02X:%02X CH: %2d RSSI: %3d SEC: %s SSID: %s"),
-		        (known ? "-->" : "   "),
-		        BSSID_scan[0], BSSID_scan[1], BSSID_scan[2], BSSID_scan[3], BSSID_scan[4], BSSID_scan[5],
-		        chan_scan,
+        {
+            char buffer[128];
+            sprintf_P(buffer,
+                PSTR("%s BSSID: %02X:%02X:%02X:%02X:%02X:%02X CH: %2d RSSI: %3d SEC: %s SSID: %s"),
+                (known ? "-->" : "   "),
+                BSSID_scan[0], BSSID_scan[1], BSSID_scan[2], BSSID_scan[3], BSSID_scan[4], BSSID_scan[5],
+                chan_scan,
                 rssi_scan,
                 _encodingString(sec_scan).c_str(),
-		        ssid_scan.c_str()
-		    );
-		    _doCallback(MESSAGE_FOUND_NETWORK, buffer);
-		}
+                ssid_scan.c_str()
+            );
+            _doCallback(MESSAGE_FOUND_NETWORK, buffer);
+        }
 
     }
 
@@ -205,6 +205,27 @@ uint8_t JustWifi::_populate(uint8_t networkCount) {
 
 }
 
+void JustWifi::softConnect() {
+    static uint8_t networkID;
+    networkID = _currentID;
+
+    // Get network
+    network_t entry = _network_list[networkID];
+    WiFi.persistent(false);
+    WiFi.enableSTA(true);
+    WiFi.hostname(_hostname);
+
+    // Configure static options
+    if (!entry.dhcp) {
+        WiFi.config(entry.ip, entry.gw, entry.netmask, entry.dns);
+    }
+    if (entry.channel == 0) {
+        WiFi.begin(entry.ssid, entry.pass);
+    } else {
+        WiFi.begin(entry.ssid, entry.pass, entry.channel, entry.bssid);
+    }
+
+}
 uint8_t JustWifi::_doSTA(uint8_t id) {
 
     static uint8_t networkID;
@@ -224,7 +245,7 @@ uint8_t JustWifi::_doSTA(uint8_t id) {
     if (RESPONSE_START == state) {
 
         WiFi.persistent(false);
-        //_disable();
+        _disable();
         WiFi.enableSTA(true);
         WiFi.hostname(_hostname);
 
@@ -234,7 +255,7 @@ uint8_t JustWifi::_doSTA(uint8_t id) {
         }
 
         // Connect
-		{
+        {
             char buffer[128];
             if (entry.scanned) {
                 snprintf_P(buffer, sizeof(buffer),
@@ -248,7 +269,7 @@ uint8_t JustWifi::_doSTA(uint8_t id) {
             } else {
                 snprintf_P(buffer, sizeof(buffer), PSTR("SSID: %s"), entry.ssid);
             }
-		    _doCallback(MESSAGE_CONNECTING, buffer);
+            _doCallback(MESSAGE_CONNECTING, buffer);
         }
 
         #ifdef JUSTWIFI_ENABLE_ENTERPRISE
