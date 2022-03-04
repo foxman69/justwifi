@@ -168,6 +168,7 @@ class JustWifi {
         bool connected();
         bool connectable();
 
+        void moveToScanMode();
         void turnOff();
         void turnOn();
         void disconnect();

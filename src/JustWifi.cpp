@@ -854,6 +854,10 @@ void JustWifi::turnOff() {
     _state = STATE_IDLE;
 }
 
+void JustWifi::moveToScanMode() {
+    _state = STATE_SCAN_START;
+}
+
 void JustWifi::turnOn() {
     WiFi.forceSleepWake();
     delay(1);
