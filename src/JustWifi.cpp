@@ -207,7 +207,7 @@ uint8_t JustWifi::_populate(uint8_t networkCount) {
 
 void JustWifi::softConnect() {
     static uint8_t networkID;
-	_doScan()
+	_doScan();
     networkID = _currentID;
 
     // Get network
