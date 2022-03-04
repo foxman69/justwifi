@@ -224,7 +224,7 @@ uint8_t JustWifi::_doSTA(uint8_t id) {
     if (RESPONSE_START == state) {
 
         WiFi.persistent(false);
-        _disable();
+        //_disable();
         WiFi.enableSTA(true);
         WiFi.hostname(_hostname);
 
